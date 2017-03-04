@@ -1,6 +1,6 @@
 package captchaCracker;
 /**
- * This class extracts the background and text color(RBG) for a captcha
+ * This class filters a captcha
  */
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,9 +9,9 @@ import java.io.*;
 import javax.imageio.ImageIO;
 
 public class ColorExtractor {
+	private BinaryImage binaryImage;
 	private BufferedImage image; 
 	private int width, height;
-	private	PixelDictionary dict;
 	int[] temp;
 	String file, f_out;
 	public ColorExtractor(String file){
@@ -21,25 +21,22 @@ public class ColorExtractor {
 			image = ImageIO.read(input);
 			width = image.getWidth();
 			height = image.getHeight();
-			dict = new PixelDictionary();
-			for(int i=0;i<height;i++){
-				for(int j=0;j<width;j++){
-					Pixel p = new Pixel(new Color(image.getRGB(j, i)));
-					dict.putData(p);
-				}
-			}
-			//dict.print();
+			removeNoiseByColor();
+			removeNoiseByWidth();
+			removeNoiseByCrop();
+			binaryImage = new BinaryImage(width, height);
+			binaryImage.read(image);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-	public String removeNoiseByColor(){
-		/**
-		 * Brief of the method and some assumptions:
-		 * Black is in the range 0 to 51
-		 * White is in the range 235 to 255
-		 * Rest is noise which will be converted into white
-		 */
+	/**
+	 * Brief of the method and some assumptions:
+	 * Black is in the range 0 to 51
+	 * White is in the range 235 to 255
+	 * Rest is noise which will be converted into white
+	 */
+	private void removeNoiseByColor(){
 		try{
 			for(int i=0;i<height;i++){
 				for(int j=0;j<width;j++){
@@ -52,21 +49,17 @@ public class ColorExtractor {
 					image.setRGB(j, i, p.getColor().getRGB());
 				}
 			}
-			f_out = file.substring(0, file.indexOf(".")) + "_filtered.jpg";
-			File output = new File(f_out);
-			ImageIO.write(image, "jpg", output);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		return f_out;
 	}
-	public String removeNoiseByWidth(){
-		/**
-		 * Remove lines and noise from the background
-		 * We assume a minimum boundary for text color scheme
-		 * If any, lines are assumed to be one pixel wide
-		 * If number of adjacent black pixels is less than or equal to two, it is removed
-		 */
+	/**
+	 * Remove lines and noise from the background
+	 * We assume a minimum boundary for text color scheme
+	 * If any, lines are assumed to be one pixel wide
+	 * If number of adjacent black pixels is less than or equal to two, it is removed
+	 */
+	private void removeNoiseByWidth(){
 		try{
 			for(int i=1;i<height-1;i++){
 				for(int j=1;j<width-1;j++){
@@ -77,21 +70,30 @@ public class ColorExtractor {
 					image.setRGB(j, i, p.getColor().getRGB());
 				}
 			}
-			f_out = file.substring(0, file.indexOf(".")) + "_filtered_width.jpg";
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Remove noise by cropping 
+	 */
+	private void removeNoiseByCrop(){
+		try{
+			image = image.getSubimage(width/4-8, 2, width/2+16, height-4);
+			f_out = file.substring(0, file.indexOf(".")) + "_filtered.jpg";
 			File output = new File(f_out);
 			ImageIO.write(image, "jpg", output);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		return f_out;
 	}
 	/**
 	 * Counts the number of adjacent black cells
 	 * @param i
 	 * @param j
 	 * @return count
-	 */
-	public int getAdjacentPixels(int i, int j){
+	 */	
+	private int getAdjacentPixels(int i, int j){
 		Pixel p[] = new Pixel[8];
 		int count = 0;
 		p[0] = new Pixel(new Color(image.getRGB(j-1, i)));
@@ -113,13 +115,20 @@ public class ColorExtractor {
 	 * Checks if it has a black pixel above and a black pixel below
 	 * @param i
 	 * @param j
-	 * @return bool
+	 * @return boolean
 	 */
-	public boolean checkVertical(int i, int j){
+	private boolean checkVertical(int i, int j){
 		Pixel upper = new Pixel(new Color(image.getRGB(j, i+1)));
 		Pixel lower = new Pixel(new Color(image.getRGB(j, i-1)));
 		if(upper.getValue()==0||lower.getValue()==0)
 			return true;
 		return false;
+	}
+	/**
+	 * Returns binary image
+	 * @return
+	 */
+	public BinaryImage getBinary(){
+		return binaryImage;
 	}
 }
