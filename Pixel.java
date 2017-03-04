@@ -3,20 +3,31 @@ package captchaCracker;
 import java.awt.Color;
 
 /**
- * Pixel data type
+ * Pixel data type for gray scale
  */
 public class Pixel {
-	//integer array to store RGB Pixel information
-	private int[] pixels;
+	//integer array to store Pixel information
+	private int value;
 	/**
-	 * Initialize pixel with a Color
+	 * Initialize pixel with a brightness value
 	 * @param c
 	 */
 	public Pixel(Color c){
-		pixels = new int[3];
-		pixels[0] = c.getRed();
-		pixels[1] = c.getBlue();
-		pixels[2] = c.getGreen();
+		value = c.getRed();
+	}
+	/**
+	 * GETTER
+	 * @return value
+	 */
+	public int getValue(){
+		return value;
+	}
+	/**
+	 * SETTER
+	 * @param value
+	 */
+	public void setValue(int value){
+		this.value = value;
 	}
 	/**
 	 * Override equals function
@@ -30,21 +41,27 @@ public class Pixel {
             return true;
         
         Pixel rhs = (Pixel) obj;
-        if(pixels[0]==rhs.pixels[0]&&pixels[1]==rhs.pixels[1]&&pixels[2]==rhs.pixels[2])
+        if(value==rhs.value)
         	return true;
         return false;
 
 	}
 	@Override
 	public int hashCode(){
-		return Integer.toString(pixels[0]).hashCode()
-				+ Integer.toString(pixels[1]).hashCode()
-				+ Integer.toString(pixels[2]).hashCode();
+		return Integer.toString(value).hashCode();
+	}
+	/**
+	 * converts into Color for writing
+	 * @return c
+	 */
+	public Color getColor(){
+		Color c = new Color(value, value, value);
+		return c;
 	}
 	/**
 	 * Print method
 	 */
 	public void print(){
-		System.out.println("("+pixels[0]+","+pixels[1]+","+pixels[2]+")");
+		System.out.println("("+value+")");
 	}
 }
