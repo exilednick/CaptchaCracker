@@ -8,7 +8,7 @@ public class MyApp {
 	final static String file = "image.jpg";
 	public static void main(String args[]){
 		GrayScaleConverter gScaleObj = new GrayScaleConverter(path+file); //Convert into gray-scale
-		ColorExtractor colorExtracter = new ColorExtractor(gScaleObj.getFileName()); //Extract colors
-		colorExtracter.removeNoise();
+		ColorExtractor colorExtractor = new ColorExtractor(gScaleObj.getFileName()); //Extract colors
+		colorExtractor.removeNoise();
 	}
 }
