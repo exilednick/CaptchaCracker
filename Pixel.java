@@ -9,7 +9,7 @@ public class Pixel {
 	//integer array to store Pixel information
 	private int value;
 	/**
-	 * Initialize pixel with a brightness value
+	 * Initialize pixel with a Color
 	 * @param c
 	 */
 	public Pixel(Color c){

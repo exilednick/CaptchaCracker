@@ -9,6 +9,6 @@ public class MyApp {
 	public static void main(String args[]){
 		GrayScaleConverter gScaleObj = new GrayScaleConverter(path+file); //Convert into gray-scale
 		ColorExtractor colorExtractor = new ColorExtractor(gScaleObj.getFileName()); //Extract colors
-		colorExtractor.removeNoise();
+		colorExtractor.removeNoiseByColor();colorExtractor.removeNoiseByWidth();
 	}
 }
