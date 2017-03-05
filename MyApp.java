@@ -10,8 +10,9 @@ public class MyApp {
 		for(int i=1;i<5;i++){
 			String temp = file + Integer.toString(i) + ".jpg";
 			GrayScaleConverter gScaleObj = new GrayScaleConverter(path+temp); //Convert into gray-scale
-			//ColorExtractor colorExtractor = 
-			new ColorExtractor(gScaleObj.getFileName()); //Extract colors
+			ImageFilterer imageFilterer = new ImageFilterer(gScaleObj.getFileName()); //Filter 
+			//CharacterRecognizer characterRecognizer = 
+			new CharacterRecognizer(imageFilterer.getBinary(), path, i); //Extract characters
 		}
 	}
 }

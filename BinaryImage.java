@@ -1,6 +1,9 @@
 package captchaCracker;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
 
 /**
  * Binary Image
@@ -64,5 +67,49 @@ public class BinaryImage {
 	 */
 	public int getData(int w, int h){
 		return data[w][h];
+	}
+	/**
+	 * Returns dimension of image
+	 * @return
+	 */
+	public int[] getDimension(){
+		int[] dim = {width, height};
+		return dim;
+	}
+	/**
+	 * Returns a cropped image of the original
+	 * @param x1 upper left X
+	 * @param y1 upper left Y
+	 * @param x2 lower right X
+	 * @param y2 lower right Y
+	 * @return
+	 */
+	public BinaryImage getSubImage(int x1, int y1, int x2, int y2){
+		BinaryImage cropped = new BinaryImage(x2-x1, y2-y1);
+		int x = 0, y = 0;
+		for(int i=x1;i<x2;i++){
+			y=0;
+			for(int j=y1;j<y2;j++){
+				cropped.data[x][y] = data[i][j];
+				y++;
+			}
+			x++;
+		}
+		return cropped;
+	}
+	/**
+	 * Prints the image in a file
+	 * @param file filename
+	 */
+	public void save(String file){
+		try{
+			BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			bi = this.write(bi);
+			String f_out = file + ".jpg";
+			File output = new File(f_out);
+			ImageIO.write(bi, "jpg", output);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }
