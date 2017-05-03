@@ -1,115 +1,124 @@
-package captchaCracker;
+package app;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
 import javax.imageio.ImageIO;
 
 /**
- * Binary Image
+ * BinaryImage data type
+ * Each pixel is either ON(white) or OFF(black)
+ * @author Shubham Sharma
  */
 public class BinaryImage {
 	private int width, height;
 	private int[][] data;
+	public final static int BINARY_ON = 1; //White
+	public final static int BINARY_OFF = 0; //Black
 	/**
 	 * Initialize BinaryImage
-	 * @param w
-	 * @param h
+	 * @param w width
+	 * @param h height
 	 */
 	public BinaryImage(int w, int h){
 		width = w;
 		height = h;
-		data = new int[width][height]; 
+		data = new int[width][height];
+		//Default pixels
+		for(int i=0;i<width;i++)
+			for(int j=0;j<height;j++)
+				data[i][j] = BINARY_OFF;
 	}
 	/**
-	 * Set data in it.
-	 * 1 represents black
-	 * 0 represents white
-	 * @param im
+	 * Sets the value for a particular pixel
+	 * @param w width index
+	 * @param h height index
+	 * @param state BINARY_OFF or BINARY_ON
 	 */
-	public void read(BufferedImage im){
-		int width = im.getWidth();
-		int height = im.getHeight();
-		for(int i=0;i<height;i++){
-			for(int j=0;j<width;j++){
-				Color c = new Color(im.getRGB(j, i));
-				if(c.getRed()==0){
-					data[j][i] = 1;
-				}else{
-					data[j][i] = 0;
-				}
-			}
-		}
+	public void setData(int w, int h, int state){
+		data[w][h] = state;
 	}
 	/**
-	 * returns BufferedImage from binary
-	 * @param bi
-	 * @return
-	 */
-	public BufferedImage write(BufferedImage bi){
-		for(int i=0;i<height;i++){
-			for(int j=0;j<width;j++){
-				int temp;
-				if(data[j][i]==0)
-					temp = 255;
-				else
-					temp = 0;
-				bi.setRGB(j, i, new Color(temp, temp, temp).getRGB());
-			}
-		}
-		return bi;
-	}
-	/**
-	 * Returns binary value at a point
-	 * @param w
-	 * @param h
-	 * @return
+	 * Returns state of the image at any pixel
+	 * @param w width index
+	 * @param h height index
+	 * @return state
 	 */
 	public int getData(int w, int h){
 		return data[w][h];
 	}
 	/**
-	 * Returns dimension of image
-	 * @return
+	 * Get width of image
+	 * @return width
 	 */
-	public int[] getDimension(){
-		int[] dim = {width, height};
-		return dim;
+	public int getWidth(){
+		return width;
 	}
 	/**
-	 * Returns a cropped image of the original
-	 * @param x1 upper left X
-	 * @param y1 upper left Y
-	 * @param x2 lower right X
-	 * @param y2 lower right Y
-	 * @return
+	 * Get height of image
+	 * @return height
 	 */
-	public BinaryImage getSubImage(int x1, int y1, int x2, int y2){
-		BinaryImage cropped = new BinaryImage(x2-x1, y2-y1);
-		int x = 0, y = 0;
-		for(int i=x1;i<x2;i++){
-			y=0;
-			for(int j=y1;j<y2;j++){
-				cropped.data[x][y] = data[i][j];
-				y++;
+	public int getHeight(){
+		return height;
+	}
+	/**
+	 * Gets the sub image of an image
+	 */
+	public BinaryImage subImage(int x1, int y1, int x2, int y2){
+		BinaryImage b = new BinaryImage(x2-x1, y2-y1);
+		int x, y = 0;
+		for(int i=y1; i<y2; i++){
+			x = 0;
+			for(int j=x1;j<x2; j++){
+				b.setData(x, y, this.getData(j, i));
+				x++;
 			}
-			x++;
+			y++;
 		}
-		return cropped;
+		return b;
 	}
 	/**
-	 * Prints the image in a file
+	 * Converts BufferedImage into BinaryImage
+	 * @param im BufferedImage object
+	 */
+	public void setImage(BufferedImage im){
+		int w = im.getWidth();
+		int h = im.getHeight();
+		for(int i=0;i<h;i++){
+			for(int j=0;j<w;j++){
+				Color c = new Color(im.getRGB(j,i));
+				//Sets pixel to ON or OFF state
+				if(c.getRed()==0){
+					data[j][i] = BINARY_OFF;
+				}else{
+					data[j][i] = BINARY_ON;
+				}
+			}
+		}
+	}
+	/**
+	 * Saves the current object as a jpg file
 	 * @param file filename
 	 */
 	public void save(String file){
 		try{
+			//Create BufferedImage instance
 			BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			bi = this.write(bi);
-			String f_out = file + ".jpg";
-			File output = new File(f_out);
+			for(int i=0;i<height;i++)
+				for(int j=0;j<width;j++){
+					int temp = 0; 
+					if(data[j][i]==BINARY_ON)
+						temp = 255; //white
+					else
+						temp = 0;   //black
+					Color new_c = new Color(temp, temp, temp);
+					bi.setRGB(j, i, new_c.getRGB());
+				}
+			String out = file + ".jpg";
+			File output = new File(out);
 			ImageIO.write(bi, "jpg", output);
 		}catch(Exception e){
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 }
